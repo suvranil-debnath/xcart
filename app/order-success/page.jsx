@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, ArrowRight, ShoppingBag } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const OrderSuccessPage = () => {
-  const router = useRouter();
+// Component that uses searchParams
+const OrderDetails = () => {
   const searchParams = useSearchParams();
   const [orderId, setOrderId] = useState('');
 
@@ -17,6 +17,23 @@ const OrderSuccessPage = () => {
       setOrderId(id);
     }
   }, [searchParams]);
+
+  return (
+    <>
+      {orderId && (
+        <div className="mb-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg inline-block">
+          <p className="text-sm text-gray-500 dark:text-gray-400">Order Reference</p>
+          <p className="text-lg font-medium text-gray-900 dark:text-white">
+            #{orderId.substring(6, 14)}
+          </p>
+        </div>
+      )}
+    </>
+  );
+};
+
+const OrderSuccessPage = () => {
+  const router = useRouter();
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -44,21 +61,16 @@ const OrderSuccessPage = () => {
             Thank you for your purchase. Your order has been received and is being processed.
           </p>
           
-          {orderId && (
-            <div className="mb-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg inline-block">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Order Reference</p>
-              <p className="text-lg font-medium text-gray-900 dark:text-white">
-                #{orderId.substring(6, 14)}
-              </p>
-            </div>
-          )}
+          <Suspense fallback={<div className="mb-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg inline-block">Loading order details...</div>}>
+            <OrderDetails />
+          </Suspense>
           
           <div className="flex flex-col sm:flex-row justify-center gap-4 mt-8">
             <Link
-              href={`/order-details/${orderId}`}
+              href="/"
               className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
             >
-              View Order Details
+              View Orders
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
             
